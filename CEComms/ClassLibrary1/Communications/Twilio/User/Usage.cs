@@ -12,9 +12,17 @@ namespace CEComms.Communications.Twilio.User {
             IEncryptionProvider decryptor = EncryptionProviderFactory.CreateInstance(EncryptionProviderFactory.CryptographyMethod.AES);
             TwilioRestClient twilio = new TwilioRestClient(decryptor.Decrypt(UserProfile.ACCOUNT_SID_CIPHER), decryptor.Decrypt(UserProfile.AUTH_TOKEN_CIPHER));
 
-            UsageTrigger trigger = twilio.CreateUsageTrigger("sms", "1000", "http://www.example.com/");
             UsageResult totalPrice = twilio.ListUsage("totalprice", "ThisMonth");
             UsageRecord record = totalPrice.UsageRecords[0];
+            return record.Usage;
+        }
+
+        public double GetSMSCountToday() {
+            IEncryptionProvider decryptor = EncryptionProviderFactory.CreateInstance(EncryptionProviderFactory.CryptographyMethod.AES);
+            TwilioRestClient twilio = new TwilioRestClient(decryptor.Decrypt(UserProfile.ACCOUNT_SID_CIPHER), decryptor.Decrypt(UserProfile.AUTH_TOKEN_CIPHER));
+
+            UsageResult totalSent = twilio.ListUsage("sms", "Today");
+            UsageRecord record = totalSent.UsageRecords[0];
             return record.Usage;
         }
     }
