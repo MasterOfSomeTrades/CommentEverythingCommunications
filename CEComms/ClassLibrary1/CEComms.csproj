@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Communications\SendGrid\CEEmail\EmailSender.cs" />
+    <Compile Include="Communications\Twilio\User\Usage.cs" />
     <Compile Include="Communications\Twilio\User\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Communications\Twilio\SMS\TextMessageSender.cs" />

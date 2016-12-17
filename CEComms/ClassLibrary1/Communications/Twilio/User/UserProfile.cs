@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CEComms.Communications.Twilio.User {
-    public class UserProfile {
+    class UserProfile {
         public const string ACCOUNT_SID_CIPHER = "PKPBJJDXite9Ccsm1Skfj2J3zq9c0v7cD8fzljHVNZYvKemFKEhyihaNgP/swDvE";
         public const string AUTH_TOKEN_CIPHER = "pAP9/hFxQ4ruGvZl5naAihLsOyBcU/kzVtyZnZK7GlAJkDfyh5h49c2vKj/NiUsw";
 
