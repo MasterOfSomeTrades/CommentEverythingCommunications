@@ -1,4 +1,5 @@
-﻿using CommentEverythingCryptography.Encryption;
+﻿using CEComms.Communications.Twilio.User;
+using CommentEverythingCryptography.Encryption;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,18 +21,26 @@ namespace Stockiment.Communications.Twilio.SMS {
             IEncryptionProvider decryptor = EncryptionProviderFactory.CreateInstance(EncryptionProviderFactory.CryptographyMethod.AES);
 
             // Find your Account Sid and Auth Token at twilio.com/user/account
-            TwilioRestClient twilio = new TwilioRestClient(decryptor.Decrypt("PKPBJJDXite9Ccsm1Skfj2J3zq9c0v7cD8fzljHVNZYvKemFKEhyihaNgP/swDvE"), decryptor.Decrypt("pAP9/hFxQ4ruGvZl5naAihLsOyBcU/kzVtyZnZK7GlAJkDfyh5h49c2vKj/NiUsw"));
+            TwilioRestClient twilio = new TwilioRestClient(decryptor.Decrypt(UserProfile.ACCOUNT_SID_CIPHER), decryptor.Decrypt(UserProfile.AUTH_TOKEN_CIPHER));
 
             if (_numberSent < MaxSend) {
                 if (msg.Length <= CharLimit) {
-                    Message message = twilio.SendMessage(decryptor.Decrypt("TSFhK1EaNhtPPJIx4UjYBA=="), decryptor.Decrypt("7eYiH6SvvlNxcvdmgX4+Yg=="), msg);
+                    foreach (string recipientCipher in UserProfile.RecipientListCiphers) {
+                        if (_numberSent < MaxSend) {
+                            Message message = twilio.SendMessage(UserProfile.PHONE_NUMBER_CIPHER, decryptor.Decrypt(recipientCipher), msg);
+                            _numberSent++;
+                        }
+                    }
                 } else {
-                    Message message = twilio.SendMessage(decryptor.Decrypt("TSFhK1EaNhtPPJIx4UjYBA=="), decryptor.Decrypt("7eYiH6SvvlNxcvdmgX4+Yg=="), "====\nSMS length over character limit/n====");
+                    Message message = twilio.SendMessage(decryptor.Decrypt(UserProfile.PHONE_NUMBER_CIPHER), decryptor.Decrypt(UserProfile.ADMIN_NUMBER_CIPHER), "====\nSMS length over character limit/n====");
+                    _numberSent++;
                 }
-            } else if (_numberSent == MaxSend) {
-                Message message = twilio.SendMessage(decryptor.Decrypt("TSFhK1EaNhtPPJIx4UjYBA=="), decryptor.Decrypt("7eYiH6SvvlNxcvdmgX4+Yg=="), "====\nSMS alerts maxed out for time period/n====");
             }
-            _numberSent++;
+
+            if (_numberSent == MaxSend) {
+                Message message = twilio.SendMessage(decryptor.Decrypt(UserProfile.PHONE_NUMBER_CIPHER), decryptor.Decrypt(UserProfile.ADMIN_NUMBER_CIPHER), "====\nSMS alerts maxed out for time period/n====");
+                _numberSent++;
+            }
         }
 
         // TODO: Counter reset as function of this class
