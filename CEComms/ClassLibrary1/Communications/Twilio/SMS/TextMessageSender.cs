@@ -31,7 +31,7 @@ namespace Stockiment.Communications.Twilio.SMS {
             // --- Send SMS limit warning if daily limit reached
             if (limitReached && !_limitWarningSent) {
                 TwilioRestClient twilio = new TwilioRestClient(decryptor.Decrypt(UserProfile.ACCOUNT_SID_CIPHER), decryptor.Decrypt(UserProfile.AUTH_TOKEN_CIPHER));
-                Message message = twilio.SendMessage(decryptor.Decrypt(UserProfile.PHONE_NUMBER_CIPHER), decryptor.Decrypt(UserProfile.ADMIN_NUMBER_CIPHER), "===========================\n SMS daily maximum reached/n===========================");
+                Message message = twilio.SendMessage(decryptor.Decrypt(UserProfile.PHONE_NUMBER_CIPHER), decryptor.Decrypt(UserProfile.ADMIN_NUMBER_CIPHER), "===========================\n SMS daily maximum reached\n===========================");
                 _limitWarningSent = true;
             }
 
@@ -55,7 +55,7 @@ namespace Stockiment.Communications.Twilio.SMS {
                     }
                 }
             } else {
-                Message message = twilio.SendMessage(decryptor.Decrypt(UserProfile.PHONE_NUMBER_CIPHER), decryptor.Decrypt(UserProfile.ADMIN_NUMBER_CIPHER), "===========================\n SMS length over character limit/n===========================");
+                Message message = twilio.SendMessage(decryptor.Decrypt(UserProfile.PHONE_NUMBER_CIPHER), decryptor.Decrypt(UserProfile.ADMIN_NUMBER_CIPHER), "===========================\n SMS length over character limit\n===========================");
             }
         }
     }
