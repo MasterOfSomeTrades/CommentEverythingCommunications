@@ -27,7 +27,7 @@ namespace Stockiment.Communications.Twilio.SMS {
                 if (msg.Length <= CharLimit) {
                     foreach (string recipientCipher in UserProfile.RecipientListCiphers) {
                         if (_numberSent < MaxSend) {
-                            Message message = twilio.SendMessage(UserProfile.PHONE_NUMBER_CIPHER, decryptor.Decrypt(recipientCipher), msg);
+                            Message message = twilio.SendMessage(decryptor.Decrypt(UserProfile.PHONE_NUMBER_CIPHER), decryptor.Decrypt(recipientCipher), msg);
                             _numberSent++;
                         }
                     }
