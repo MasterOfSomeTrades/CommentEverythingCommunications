@@ -8,22 +8,22 @@ using Twilio;
 
 namespace CEComms.Communications.Twilio.User {
     public class Usage {
-        public double GetUsageThisMonth() {
+        public decimal GetUsageThisMonth() {
             IEncryptionProvider decryptor = EncryptionProviderFactory.CreateInstance(EncryptionProviderFactory.CryptographyMethod.AES);
             TwilioRestClient twilio = new TwilioRestClient(decryptor.Decrypt(UserProfile.ACCOUNT_SID_CIPHER), decryptor.Decrypt(UserProfile.AUTH_TOKEN_CIPHER));
 
             UsageResult totalPrice = twilio.ListUsage("totalprice", "ThisMonth");
             UsageRecord record = totalPrice.UsageRecords[0];
-            return record.Usage;
+            return (decimal) record.Usage;
         }
 
-        public double GetSMSCountToday() {
+        public int GetSMSCountToday() {
             IEncryptionProvider decryptor = EncryptionProviderFactory.CreateInstance(EncryptionProviderFactory.CryptographyMethod.AES);
             TwilioRestClient twilio = new TwilioRestClient(decryptor.Decrypt(UserProfile.ACCOUNT_SID_CIPHER), decryptor.Decrypt(UserProfile.AUTH_TOKEN_CIPHER));
 
             UsageResult totalSent = twilio.ListUsage("sms", "Today");
             UsageRecord record = totalSent.UsageRecords[0];
-            return record.Usage;
+            return (int) Math.Round(record.Usage);
         }
     }
 }
