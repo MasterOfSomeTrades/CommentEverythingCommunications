@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Communications\Indicators\SendFlag.cs" />
     <Compile Include="Communications\SendGrid\CEEmail\EmailSender.cs" />
+    <Compile Include="Communications\SendGrid\User\UserProfile.cs" />
     <Compile Include="Communications\Twilio\User\Usage.cs" />
     <Compile Include="Communications\Twilio\User\UserProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

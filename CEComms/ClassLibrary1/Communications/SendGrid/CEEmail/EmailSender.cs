@@ -1,4 +1,5 @@
 ﻿using CEComms.Communications.Indicators;
+using CEComms.Communications.SendGrid.User;
 using CommentEverythingCryptography.Encryption;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -12,40 +13,45 @@ namespace Stockiment.Communications.SendGrid.CEEmail {
     public class EmailSender {
         public EmailSender() {
             MaxSend = 20;
-            CharLimit = 100000;
+            CharLimit = 1000000;
         }
 
         public int MaxSend { get; set; }
         public int CharLimit { get; set; }
         private int _numberSent = 0;
         public SendFlag SendFlag = new SendFlag();
+        public UserProfile User = new UserProfile();
 
         public void SendEmail(string subject, string msg) {
             if (SendFlag.ShouldSend()) {
                 IEncryptionProvider decryptor = EncryptionProviderFactory.CreateInstance(EncryptionProviderFactory.CryptographyMethod.AES);
 
-                SendGridAPIClient sg = new SendGridAPIClient(decryptor.Decrypt("vZZswAyoKBvDmSIf8Uso4r14Yen35On52P2rybFzhAjQTyFvjUjxtxOtw5EezQVjSl9KJDu1scyVJeYRRUcltYFqud7wkgjftHFyKEkIYyk ="));
-                Email from = new Email(decryptor.Decrypt("U48Ul4Ozn6/k44sqAIL9hjh/YC/hFSi1okBtaKehUAA="));
-                Email to = new Email(decryptor.Decrypt("T97nnD8qgDCMvR2xFTqBI0B+UYBqW7CQrZv2NGowfjA="));
+                SendGridAPIClient sg = new SendGridAPIClient(decryptor.Decrypt(User.APIKeyCipher));
+                Email from = new Email(decryptor.Decrypt(User.FromEmailCipher));
+                Email admin = new Email(decryptor.Decrypt(User.AdminEmailCipher));
 
-                if (_numberSent < MaxSend) {
-                    if (msg.Length <= CharLimit) {
-                        Content content = new Content("text/plain", msg);
-                        Mail mail = new Mail(from, subject, to, content);
-                        sg.client.mail.send.post(requestBody: mail.Get());
-                    } else {
+                foreach (string addrCipher in User.RecipientListCiphers) {
+                    Email to = new Email(decryptor.Decrypt(addrCipher));
+
+                    if (_numberSent < MaxSend) {
+                        if (msg.Length <= CharLimit) {
+                            Content content = new Content("text/plain", msg);
+                            Mail mail = new Mail(from, subject, to, content);
+                            sg.client.mail.send.post(requestBody: mail.Get());
+                        } else {
+                            subject = "Undeliverable Mail";
+                            Content content = new Content("text/plain", "Email not delivered to " + decryptor.Decrypt(addrCipher) + ". Email message length greater than maximum number of characters of " + CharLimit.ToString());
+                            Mail mail = new Mail(from, subject, admin, content);
+                            sg.client.mail.send.post(requestBody: mail.Get());
+                        }
+                    } else if (_numberSent == MaxSend) {
                         subject = "Undeliverable Mail";
-                        Content content = new Content("text/plain", "Email message length greater than maximum number of characters of " + CharLimit.ToString());
-                        Mail mail = new Mail(from, subject, to, content);
+                        Content content = new Content("text/plain", "Email not delivered to " + decryptor.Decrypt(addrCipher) + ". Number of email messages sent in specified time period has reached the limit of " + MaxSend.ToString());
+                        Mail mail = new Mail(from, subject, admin, content);
                         sg.client.mail.send.post(requestBody: mail.Get());
                     }
-                } else if (_numberSent == MaxSend) {
-                    subject = "Undeliverable Mail";
-                    Content content = new Content("text/plain", "Number of email messages sent in specified time period has reached the limit of " + MaxSend.ToString());
-                    Mail mail = new Mail(from, subject, to, content);
-                    sg.client.mail.send.post(requestBody: mail.Get());
+                    _numberSent++;
                 }
-                _numberSent++;
             }
         }
 
