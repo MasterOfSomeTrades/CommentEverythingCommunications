@@ -12,6 +12,7 @@ namespace Stockiment.Communications.Twilio.SMS {
         public int MaxSend { get; set; }
         public int CharLimit { get; set; }
         public SendFlag SendFlag = new SendFlag();
+        public UserProfile User = new UserProfile();
 
         public TextMessageSender() {
             MaxSend = 200;
@@ -52,7 +53,7 @@ namespace Stockiment.Communications.Twilio.SMS {
                 TwilioRestClient twilio = new TwilioRestClient(decryptor.Decrypt(UserProfile.ACCOUNT_SID_CIPHER), decryptor.Decrypt(UserProfile.AUTH_TOKEN_CIPHER));
 
                 if (msg.Length <= CharLimit) {
-                    foreach (string recipientCipher in UserProfile.RecipientListCiphers) {
+                    foreach (string recipientCipher in User.RecipientListCiphers) {
                         if (!SMSLimitReached()) {
                             Message message = twilio.SendMessage(decryptor.Decrypt(UserProfile.PHONE_NUMBER_CIPHER), decryptor.Decrypt(recipientCipher), msg);
                         }
